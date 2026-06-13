@@ -1,0 +1,39 @@
+{
+  "risk_model": {
+    "type": "RandomForestClassifier",
+    "accuracy": 0.8583,
+    "features": [
+      "age",
+      "income",
+      "expenses",
+      "savings_ratio",
+      "dependents",
+      "horizon",
+      "existing_investments",
+      "crash_behavior",
+      "experience",
+      "focus"
+    ],
+    "classes": [
+      "Conservative",
+      "Moderate",
+      "Aggressive"
+    ]
+  },
+  "sip_model": {
+    "type": "GradientBoostingRegressor",
+    "r2": 0.9957,
+    "mae": 10706037.0,
+    "features": [
+      "sip_amount",
+      "horizon_years",
+      "stepup_percent",
+      "risk_category",
+      "market_condition"
+    ]
+  },
+  "recommender": {
+    "type": "WeightedScoringModel",
+    "funds_in_db": 17
+  }
+}

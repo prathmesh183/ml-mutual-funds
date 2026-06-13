@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RetireWise+ | AI Portfolio Advisor</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:   #0B1F3A;
+  --teal:   #1A8C74;
+  --teal-l: #E8F5F1;
+  --gold:   #C8933A;
+  --gold-l: #FDF3E3;
+  --red:    #C0392B;
+  --red-l:  #FDECEA;
+  --blue:   #1E5FAD;
+  --blue-l: #EAF1FB;
+  --gray:   #F4F5F7;
+  --border: #E2E5EA;
+  --text:   #1A1D23;
+  --muted:  #6B7280;
+  --white:  #ffffff;
+  --radius: 12px;
+  --shadow: 0 2px 12px rgba(11,31,58,0.08);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: 'DM Sans', sans-serif; color: var(--text); background: #F7F8FA; font-size: 15px; }
+
+/* ── NAV ── */
+nav {
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  padding: 0 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 60px;
+  position: sticky; top: 0; z-index: 100;
+}
+.logo { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--navy); text-decoration: none; }
+.logo span { color: var(--teal); }
+.nav-links { display: flex; gap: 1.5rem; }
+.nav-links a { font-size: 14px; color: var(--muted); text-decoration: none; font-weight: 400; }
+.nav-links a:hover { color: var(--navy); }
+.nav-cta { background: var(--teal); color: white; padding: 7px 18px; border-radius: 6px; font-size: 13px; font-weight: 500; text-decoration: none; }
+
+/* ── HERO STRIP ── */
+.hero {
+  background: var(--navy);
+  color: white;
+  padding: 2.5rem 2rem;
+  text-align: center;
+}
+.hero h1 { font-family: 'DM Serif Display', serif; font-size: 2rem; margin-bottom: 8px; line-height: 1.2; }
+.hero h1 em { color: #6FD4BB; font-style: normal; }
+.hero p { font-size: 14px; color: rgba(255,255,255,0.65); max-width: 480px; margin: 0 auto; }
+.badges { display: flex; justify-content: center; gap: 12px; margin-top: 1rem; flex-wrap: wrap; }
+.badge { font-size: 11px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.75); padding: 4px 12px; border-radius: 20px; }
+
+/* ── MODEL PILLS ── */
+.model-pills { display: flex; justify-content: center; gap: 8px; padding: 1rem 2rem; background: white; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+.model-pill { display: flex; align-items: center; gap: 6px; font-size: 12px; background: var(--gray); color: var(--muted); padding: 5px 14px; border-radius: 20px; font-weight: 500; }
+.model-pill .dot { width: 7px; height: 7px; border-radius: 50%; }
+.mp-rf .dot { background: #1E5FAD; }
+.mp-gb .dot { background: #1A8C74; }
+.mp-ws .dot { background: #C8933A; }
+
+/* ── MAIN LAYOUT ── */
+.container { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem; display: grid; grid-template-columns: 380px 1fr; gap: 1.5rem; align-items: start; }
+@media (max-width: 860px) { .container { grid-template-columns: 1fr; } }
+
+/* ── FORM CARD ── */
+.form-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; position: sticky; top: 76px; }
+.form-header { background: var(--navy); padding: 1.25rem 1.5rem; }
+.form-header h2 { font-family: 'DM Serif Display', serif; font-size: 18px; color: white; margin-bottom: 3px; }
+.form-header p { font-size: 12px; color: rgba(255,255,255,0.55); }
+.form-body { padding: 1.25rem 1.5rem; }
+.progress-bar { height: 3px; background: var(--border); border-radius: 2px; margin-bottom: 1.25rem; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--teal); border-radius: 2px; transition: width 0.4s ease; width: 0%; }
+
+.step-label { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase; margin-bottom: 10px; }
+.fgroup { margin-bottom: 14px; }
+.fgroup label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 5px; font-weight: 500; }
+.fgroup input, .fgroup select {
+  width: 100%; border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px;
+  font-size: 14px; font-family: 'DM Sans', sans-serif; color: var(--text);
+  background: white; outline: none; transition: border-color 0.15s;
+}
+.fgroup input:focus, .fgroup select:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(26,140,116,0.08); }
+.frow { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.chip-wrap { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.chip { font-size: 12px; border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px; cursor: pointer; color: var(--muted); background: white; transition: all 0.15s; user-select: none; }
+.chip:hover { border-color: var(--teal); color: var(--teal); }
+.chip.on { background: var(--teal-l); border-color: var(--teal); color: var(--teal); font-weight: 500; }
+.chip.on-gold { background: var(--gold-l); border-color: var(--gold); color: var(--gold); font-weight: 500; }
+
+.step-nav { display: flex; gap: 8px; margin-top: 1rem; }
+.step-nav button { flex: 1; padding: 9px; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.15s; }
+.btn-back { border: 1px solid var(--border); background: white; color: var(--muted); }
+.btn-back:hover { border-color: var(--navy); color: var(--navy); }
+.btn-next { background: var(--teal); color: white; border: none; }
+.btn-next:hover { background: #156b5a; }
+.btn-next:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; }
+.btn-go { background: var(--navy); color: white; border: none; }
+.btn-go:hover { background: #0a1628; }
+
+/* steps visibility */
+.form-step { display: none; }
+.form-step.active { display: block; }
+
+/* ── RIGHT PANEL ── */
+.right-panel {}
+.placeholder-card {
+  background: white; border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 3rem 2rem; text-align: center; color: var(--muted);
+}
+.placeholder-icon { font-size: 2.5rem; margin-bottom: 1rem; opacity: 0.4; }
+.placeholder-card h3 { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--navy); margin-bottom: 8px; }
+.placeholder-card p { font-size: 13px; line-height: 1.6; }
+
+.loading-card { background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 3rem 2rem; text-align: center; }
+.loader { width: 40px; height: 40px; border: 3px solid var(--border); border-top-color: var(--teal); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto 1rem; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-card p { font-size: 13px; color: var(--muted); }
+.loading-card strong { font-size: 15px; color: var(--navy); display: block; margin-bottom: 6px; }
+
+/* ── RESULT SECTIONS ── */
+.result-wrap { display: flex; flex-direction: column; gap: 1rem; }
+.section-card { background: white; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.sc-head { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--border); }
+.sc-head h3 { font-size: 14px; font-weight: 600; color: var(--navy); }
+.sc-head .model-tag { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; padding: 3px 8px; border-radius: 4px; }
+.tag-rf { background: var(--blue-l); color: var(--blue); }
+.tag-gb { background: var(--teal-l); color: var(--teal); }
+.tag-ws { background: var(--gold-l); color: var(--gold); }
+.sc-body { padding: 14px 16px; }
+
+/* Summary row */
+.summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+@media (max-width: 600px) { .summary-grid { grid-template-columns: 1fr 1fr; } }
+.stat-box { background: var(--gray); border-radius: 8px; padding: 10px; text-align: center; }
+.stat-box .slabel { font-size: 10px; color: var(--muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
+.stat-box .sval { font-size: 18px; font-weight: 600; color: var(--navy); margin: 3px 0 0; }
+.stat-box .sval.teal { color: var(--teal); }
+.stat-box .sval.gold { color: var(--gold); }
+.stat-box .sval.red  { color: var(--red); }
+
+/* Risk bar */
+.risk-bars { margin-top: 10px; }
+.rbar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+.rbar-label { font-size: 12px; color: var(--muted); min-width: 90px; }
+.rbar-track { flex: 1; height: 6px; background: var(--gray); border-radius: 3px; overflow: hidden; }
+.rbar-fill { height: 100%; border-radius: 3px; transition: width 0.8s ease; }
+.rbar-val { font-size: 12px; font-weight: 500; color: var(--navy); min-width: 36px; text-align: right; }
+.risk-verdict { margin-top: 10px; display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 8px; }
+.rv-conservative { background: var(--blue-l); }
+.rv-moderate      { background: var(--gold-l); }
+.rv-aggressive    { background: #FDE8E8; }
+.rv-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.rv-text { font-size: 12px; font-weight: 500; }
+
+/* Fund table */
+.fund-list { display: flex; flex-direction: column; gap: 0; }
+.fund-item { display: grid; grid-template-columns: 1fr auto auto auto; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.fund-item:last-child { border-bottom: none; }
+.fi-name { min-width: 0; }
+.fi-name .fn { font-size: 13px; font-weight: 500; color: var(--navy); line-height: 1.3; }
+.fi-name .fc { font-size: 11px; margin-top: 2px; }
+.cat-pill { display: inline-block; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 4px; }
+.cat-blue   { background: var(--blue-l); color: var(--blue); }
+.cat-amber  { background: var(--gold-l); color: var(--gold); }
+.cat-red    { background: var(--red-l);  color: var(--red); }
+.cat-green  { background: #EAF5ED; color: #1A7A35; }
+.cat-teal   { background: var(--teal-l); color: var(--teal); }
+.cat-gray   { background: var(--gray); color: var(--muted); }
+.fi-bar { width: 60px; height: 5px; background: var(--gray); border-radius: 3px; overflow: hidden; }
+.fi-bar-fill { height: 100%; background: var(--teal); border-radius: 3px; }
+.fi-pct { font-size: 13px; font-weight: 600; color: var(--teal); min-width: 32px; text-align: right; }
+.fi-sip { font-size: 11px; color: var(--muted); min-width: 72px; text-align: right; }
+.fi-nav { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+/* Projection */
+.proj-cards { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+.proj-card { border-radius: 8px; padding: 12px; text-align: center; }
+.proj-cons { background: var(--red-l); }
+.proj-real { background: var(--teal-l); }
+.proj-opti { background: var(--gold-l); }
+.proj-lbl { font-size: 10px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; margin-bottom: 4px; }
+.proj-cons .proj-lbl { color: var(--red); }
+.proj-real .proj-lbl { color: var(--teal); }
+.proj-opti .proj-lbl { color: var(--gold); }
+.proj-amt { font-family: 'DM Serif Display', serif; font-size: 20px; }
+.proj-cons .proj-amt { color: var(--red); }
+.proj-real .proj-amt { color: var(--teal); }
+.proj-opti .proj-amt { color: var(--gold); }
+.proj-rate { font-size: 10px; color: var(--muted); margin-top: 2px; }
+.goal-feasibility { margin-top: 10px; padding: 8px 12px; border-radius: 8px; font-size: 12px; font-weight: 500; }
+.gf-ok  { background: var(--teal-l); color: var(--teal); }
+.gf-low { background: var(--red-l);  color: var(--red); }
+
+/* Goals */
+.goal-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); }
+.goal-row:last-child { border-bottom: none; }
+.gr-name { font-size: 13px; font-weight: 500; color: var(--navy); text-transform: capitalize; }
+.gr-pills { display: flex; gap: 5px; }
+.gpill { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 4px; text-transform: capitalize; }
+.gp-high   { background: var(--red-l);  color: var(--red); }
+.gp-medium { background: var(--gold-l); color: var(--gold); }
+.gp-low    { background: var(--teal-l); color: var(--teal); }
+.gp-long   { background: var(--blue-l); color: var(--blue); }
+.gp-medium-t { background: var(--gold-l); color: var(--gold); }
+.gp-short  { background: #F3E8FF; color: #7C3AED; }
+
+/* Risks & tips */
+.risk-item { display: flex; align-items: flex-start; gap: 8px; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 12px; color: var(--muted); line-height: 1.5; }
+.risk-item:last-child { border-bottom: none; }
+.ri-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+
+/* rebalance */
+.rebal-note { font-size: 12px; color: var(--muted); line-height: 1.7; padding: 8px 0; }
+
+/* alert box */
+.alert-box { padding: 9px 12px; border-radius: 8px; font-size: 12px; line-height: 1.5; margin-top: 10px; }
+.ab-warn  { background: var(--gold-l); color: #7A5200; border-left: 3px solid var(--gold); }
+.ab-ok    { background: var(--teal-l); color: #0D5740; border-left: 3px solid var(--teal); }
+.ab-red   { background: var(--red-l);  color: #7A0E0E; border-left: 3px solid var(--red); }
+
+/* CTA */
+.cta-strip { background: var(--navy); border-radius: var(--radius); padding: 1.25rem 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.cta-strip p { color: rgba(255,255,255,0.7); font-size: 13px; }
+.cta-strip strong { color: white; font-size: 15px; display: block; margin-bottom: 3px; }
+.cta-btn { background: var(--teal); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap; text-decoration: none; }
+
+/* disclaimer */
+.disclaimer { font-size: 11px; color: var(--muted); line-height: 1.6; padding: 1rem 0; text-align: center; }
+
+/* ── FOOTER ── */
+footer { background: var(--navy); color: rgba(255,255,255,0.5); text-align: center; padding: 1.5rem; font-size: 12px; margin-top: 3rem; }
+footer a { color: rgba(255,255,255,0.6); }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="/">RetireWise<span>+</span></a>
+  <div class="nav-links">
+    <a href="/tools">Calculators</a>
+    <a href="/funds">Funds</a>
+    <a href="/about">About</a>
+  </div>
+  <a class="nav-cta" href="/lead">Free Consultation</a>
+</nav>
+
+<div class="hero">
+  <h1>AI-Powered <em>Portfolio Advisor</em></h1>
+  <p>3 machine learning models analyze your profile and recommend a personalized mutual fund portfolio</p>
+  <div class="badges">
+    <span class="badge">Random Forest · Risk Profiler</span>
+    <span class="badge">Gradient Boosting · SIP Predictor</span>
+    <span class="badge">Weighted Scoring · Fund Recommender</span>
+    <span class="badge">Live NAV via MFAPI</span>
+  </div>
+</div>
+
+<div class="model-pills">
+  <div class="model-pill mp-rf"><span class="dot"></span> Risk Profiler — RandomForestClassifier (85.8% acc.)</div>
+  <div class="model-pill mp-gb"><span class="dot"></span> SIP Predictor — GradientBoostingRegressor (R²: 0.9957)</div>
+  <div class="model-pill mp-ws"><span class="dot"></span> Recommender — Weighted Scoring Model (17 funds)</div>
+</div>
+
+<div class="container">
+
+  <!-- ── FORM ── -->
+  <div class="form-card">
+    <div class="form-header">
+      <h2>Your Financial Profile</h2>
+      <p>Fill in 4 quick steps to get your ML-generated plan</p>
+    </div>
+    <div class="form-body">
+      <div class="progress-bar"><div class="progress-fill" id="prog"></div></div>
+
+      <!-- Step 1 -->
+      <div class="form-step active" id="fs1">
+        <div class="step-label">Step 1 of 4 — Basic Info</div>
+        <div class="frow">
+          <div class="fgroup"><label>Monthly Income (₹)</label><input type="number" id="income" placeholder="e.g. 80000"></div>
+          <div class="fgroup"><label>Monthly Expenses (₹)</label><input type="number" id="expenses" placeholder="e.g. 45000"></div>
+        </div>
+        <div class="frow">
+          <div class="fgroup"><label>Age</label><input type="number" id="age" placeholder="32" min="18" max="70"></div>
+          <div class="fgroup"><label>Dependents</label><input type="number" id="dependents" placeholder="2" min="0"></div>
+        </div>
+        <div class="fgroup"><label>Existing Investments (₹)</label><input type="number" id="existing" placeholder="0 if none"></div>
+        <div class="step-nav"><button class="btn-next" onclick="goStep(2)">Next →</button></div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="form-step" id="fs2">
+        <div class="step-label">Step 2 of 4 — Goals & Risk</div>
+        <div class="fgroup">
+          <label>Risk Appetite (stated)</label>
+          <div class="chip-wrap" id="risk-cw">
+            <div class="chip" data-k="risk" data-v="conservative" onclick="pickChip(this,'risk')">Conservative</div>
+            <div class="chip" data-k="risk" data-v="moderate" onclick="pickChip(this,'risk')">Moderate</div>
+            <div class="chip" data-k="risk" data-v="aggressive" onclick="pickChip(this,'risk')">Aggressive</div>
+          </div>
+        </div>
+        <div class="fgroup" style="margin-top:10px;">
+          <label>Investment Goals</label>
+          <div class="chip-wrap">
+            <div class="chip" data-k="goals" data-v="retirement" onclick="toggleGoal(this)">Retirement</div>
+            <div class="chip" data-k="goals" data-v="education" onclick="toggleGoal(this)">Child Education</div>
+            <div class="chip" data-k="goals" data-v="wealth" onclick="toggleGoal(this)">Wealth Building</div>
+            <div class="chip" data-k="goals" data-v="house" onclick="toggleGoal(this)">House Purchase</div>
+            <div class="chip" data-k="goals" data-v="emergency" onclick="toggleGoal(this)">Emergency Fund</div>
+            <div class="chip" data-k="goals" data-v="marriage" onclick="toggleGoal(this)">Marriage</div>
+          </div>
+        </div>
+        <div class="step-nav">
+          <button class="btn-back" onclick="goStep(1)">← Back</button>
+          <button class="btn-next" onclick="goStep(3)">Next →</button>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="form-step" id="fs3">
+        <div class="step-label">Step 3 of 4 — SIP Details</div>
+        <div class="frow">
+          <div class="fgroup"><label>Monthly SIP (₹)</label><input type="number" id="sip" placeholder="15000"></div>
+          <div class="fgroup"><label>Horizon (years)</label><input type="number" id="horizon" placeholder="15" min="1" max="40"></div>
+        </div>
+        <div class="fgroup">
+          <label>Annual SIP Step-Up</label>
+          <div class="chip-wrap" id="stepup-cw">
+            <div class="chip" data-k="stepup" data-v="0" onclick="pickChip(this,'stepup')">No step-up</div>
+            <div class="chip" data-k="stepup" data-v="5" onclick="pickChip(this,'stepup')">5%/yr</div>
+            <div class="chip" data-k="stepup" data-v="10" onclick="pickChip(this,'stepup')">10%/yr</div>
+            <div class="chip" data-k="stepup" data-v="15" onclick="pickChip(this,'stepup')">15%/yr</div>
+          </div>
+        </div>
+        <div class="fgroup" style="margin-top:10px;">
+          <label>Include ELSS (Tax Saving)?</label>
+          <div class="chip-wrap" id="elss-cw">
+            <div class="chip" data-k="elss" data-v="yes" onclick="pickChip(this,'elss')">Yes, include ELSS</div>
+            <div class="chip" data-k="elss" data-v="no" onclick="pickChip(this,'elss')">No</div>
+          </div>
+        </div>
+        <div class="step-nav">
+          <button class="btn-back" onclick="goStep(2)">← Back</button>
+          <button class="btn-next" onclick="goStep(4)">Next →</button>
+        </div>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="form-step" id="fs4">
+        <div class="step-label">Step 4 of 4 — Behavior</div>
+        <div class="fgroup">
+          <label>If portfolio drops 30%, you would:</label>
+          <div class="chip-wrap" id="crash-cw">
+            <div class="chip" data-k="crash" data-v="panic" onclick="pickChip(this,'crash')">Panic & sell</div>
+            <div class="chip" data-k="crash" data-v="wait" onclick="pickChip(this,'crash')">Wait nervously</div>
+            <div class="chip" data-k="crash" data-v="buy" onclick="pickChip(this,'crash')">Invest more</div>
+          </div>
+        </div>
+        <div class="fgroup" style="margin-top:10px;">
+          <label>Investment Experience</label>
+          <div class="chip-wrap" id="exp-cw">
+            <div class="chip" data-k="exp" data-v="beginner" onclick="pickChip(this,'exp')">Beginner</div>
+            <div class="chip" data-k="exp" data-v="some" onclick="pickChip(this,'exp')">Some experience</div>
+            <div class="chip" data-k="exp" data-v="experienced" onclick="pickChip(this,'exp')">Experienced</div>
+          </div>
+        </div>
+        <div class="fgroup" style="margin-top:10px;">
+          <label>Primary Focus</label>
+          <div class="chip-wrap" id="focus-cw">
+            <div class="chip" data-k="focus" data-v="safety" onclick="pickChip(this,'focus')">Capital safety</div>
+            <div class="chip" data-k="focus" data-v="balanced" onclick="pickChip(this,'focus')">Balanced growth</div>
+            <div class="chip" data-k="focus" data-v="growth" onclick="pickChip(this,'focus')">Max growth</div>
+          </div>
+        </div>
+        <div class="step-nav">
+          <button class="btn-back" onclick="goStep(3)">← Back</button>
+          <button class="btn-go" onclick="submitForm()">Analyze with ML →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── RIGHT PANEL ── -->
+  <div class="right-panel" id="right-panel">
+    <div class="placeholder-card">
+      <div class="placeholder-icon">📊</div>
+      <h3>Your ML-Generated Portfolio</h3>
+      <p>Fill in your details on the left and our 3 ML models will analyze your profile and recommend a personalized mutual fund portfolio with live NAV data.</p>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  © RetireWise+ | AMFI Registered | ARN-330249 | Pune, Maharashtra<br>
+  Mutual fund investments are subject to market risks. Read all scheme-related documents carefully.<br>
+  <span style="color:rgba(255,255,255,0.3);">ML Models: RandomForestClassifier · GradientBoostingRegressor · Weighted Scoring | Live data via MFAPI.in</span>
+</footer>
+
+<script>
+const S = { risk: null, goals: [], stepup: null, elss: null, crash: null, exp: null, focus: null };
+const STEPS = 4;
+
+function pickChip(el, key) {
+  S[key] = el.dataset.v;
+  el.closest('.chip-wrap').querySelectorAll('.chip').forEach(c => { c.classList.remove('on','on-gold'); });
+  el.classList.add(key === 'stepup' ? 'on-gold' : 'on');
+}
+
+function toggleGoal(el) {
+  const v = el.dataset.v;
+  const i = S.goals.indexOf(v);
+  if (i === -1) { S.goals.push(v); el.classList.add('on'); }
+  else { S.goals.splice(i, 1); el.classList.remove('on'); }
+}
+
+function goStep(n) {
+  if (n === 2) {
+    if (!document.getElementById('income').value || !document.getElementById('expenses').value || !document.getElementById('age').value)
+      return alert('Please fill in income, expenses, and age.');
+  }
+  if (n === 3) {
+    if (!S.risk) return alert('Please select your risk appetite.');
+    if (!S.goals.length) return alert('Please select at least one goal.');
+  }
+  if (n === 4) {
+    if (!document.getElementById('sip').value || !document.getElementById('horizon').value)
+      return alert('Please enter your SIP amount and horizon.');
+    if (!S.stepup) return alert('Please select a step-up option.');
+    if (!S.elss) return alert('Please select ELSS preference.');
+  }
+  document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
+  document.getElementById('fs' + n).classList.add('active');
+  document.getElementById('prog').style.width = ((n - 1) / STEPS * 100) + '%';
+}
+
+function fmt(n) { return '₹' + Math.round(n).toLocaleString('en-IN'); }
+function stars(n) { return '★'.repeat(n) + '☆'.repeat(5 - n); }
+
+const CAT_CLASS = { 'Large Cap':'cat-blue','Mid Cap':'cat-amber','Small Cap':'cat-red',
+                    'ELSS':'cat-green','Flexi Cap':'cat-teal','Hybrid':'cat-blue',
+                    'Debt':'cat-gray','Liquid':'cat-gray' };
+
+function submitForm() {
+  if (!S.crash || !S.exp || !S.focus) return alert('Please answer all questions.');
+  document.getElementById('prog').style.width = '100%';
+
+  document.getElementById('right-panel').innerHTML = `
+    <div class="loading-card">
+      <div class="loader"></div>
+      <strong>Running ML models...</strong>
+      <p>Risk Profiler · SIP Predictor · Portfolio Recommender</p>
+    </div>`;
+
+  const payload = {
+    income:      parseFloat(document.getElementById('income').value),
+    expenses:    parseFloat(document.getElementById('expenses').value),
+    age:         parseInt(document.getElementById('age').value),
+    dependents:  parseInt(document.getElementById('dependents').value) || 0,
+    existing:    parseFloat(document.getElementById('existing').value) || 0,
+    sip:         parseFloat(document.getElementById('sip').value),
+    horizon:     parseInt(document.getElementById('horizon').value),
+    stepup:      parseInt(S.stepup || 0),
+    elss:        S.elss,
+    goals:       S.goals,
+    crash_behavior: S.crash,
+    experience:  S.exp,
+    focus:       S.focus,
+  };
+
+  fetch('/api/predict', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+  .then(r => r.json())
+  .then(d => renderResult(d, payload))
+  .catch(() => {
+    document.getElementById('right-panel').innerHTML = `<div class="placeholder-card"><h3>Connection Error</h3><p>Could not reach the ML server. Make sure Flask is running on port 5000.</p></div>`;
+  });
+}
+
+function renderResult(d, p) {
+  const risk = d.risk;
+  const riskColors = { Conservative: '#1E5FAD', Moderate: '#C8933A', Aggressive: '#C0392B' };
+  const riskClasses = { Conservative: 'rv-conservative', Moderate: 'rv-moderate', Aggressive: 'rv-aggressive' };
+  const rColor = riskColors[risk.label] || '#1A1D23';
+
+  const riskBars = Object.entries(risk.probabilities).map(([lbl, pct]) =>
+    `<div class="rbar-row">
+      <div class="rbar-label">${lbl}</div>
+      <div class="rbar-track"><div class="rbar-fill" style="width:${pct}%;background:${riskColors[lbl]||'#888'}"></div></div>
+      <div class="rbar-val">${pct}%</div>
+    </div>`).join('');
+
+  const fundsHtml = d.funds.map(f =>
+    `<div class="fund-item">
+      <div class="fi-name">
+        <div class="fn">${f.name}</div>
+        <div class="fc">
+          <span class="cat-pill ${CAT_CLASS[f.category]||'cat-gray'}">${f.category}</span>
+          <span style="font-size:11px;color:var(--muted);margin-left:4px;">${f.amc}</span>
+          ${f.nav ? `<span class="fi-nav">NAV: ₹${f.nav} (${f.nav_date})</span>` : ''}
+        </div>
+      </div>
+      <div class="fi-bar"><div class="fi-bar-fill" style="width:${f.allocation}%"></div></div>
+      <div class="fi-pct">${f.allocation}%</div>
+      <div class="fi-sip">${fmt(f.sip_amount)}/mo</div>
+    </div>`).join('');
+
+  const proj = d.projections;
+  const sipNeeded = Math.round(p.sip * 1.3);
+  const goalMet = proj.realistic > p.sip * p.horizon * 12 * 1.5;
+
+  const goalsHtml = d.goals.map(g =>
+    `<div class="goal-row">
+      <div class="gr-name">${g.name}</div>
+      <div class="gr-pills">
+        <span class="gpill gp-${g.priority}">${g.priority}</span>
+        <span class="gpill gp-${g.timeframe}">${g.timeframe}-term</span>
+      </div>
+    </div>`).join('');
+
+  document.getElementById('right-panel').innerHTML = `
+    <div class="result-wrap">
+
+      <!-- Summary -->
+      <div class="section-card">
+        <div class="sc-head"><h3>Profile Summary</h3></div>
+        <div class="sc-body">
+          <div class="summary-grid">
+            <div class="stat-box"><div class="slabel">Income</div><div class="sval">${fmt(p.income)}</div></div>
+            <div class="stat-box"><div class="slabel">Monthly Savings</div><div class="sval teal">${fmt(d.monthly_savings)}</div></div>
+            <div class="stat-box"><div class="slabel">SIP / Income</div><div class="sval gold">${d.sip_pct_income}%</div></div>
+            <div class="stat-box"><div class="slabel">Horizon</div><div class="sval">${p.horizon} yrs</div></div>
+          </div>
+          ${d.sip_affordable
+            ? `<div class="alert-box ab-ok" style="margin-top:10px;">✓ SIP of ${fmt(p.sip)}/month is affordable (${d.sip_pct_income}% of income)</div>`
+            : `<div class="alert-box ab-red" style="margin-top:10px;">⚠ SIP may strain your budget. Consider reducing to ${fmt(d.monthly_savings * 0.5)}/month</div>`}
+        </div>
+      </div>
+
+      <!-- Risk Profiler -->
+      <div class="section-card">
+        <div class="sc-head"><h3>Risk Profile</h3><span class="model-tag tag-rf">RandomForestClassifier · 85.8% acc</span></div>
+        <div class="sc-body">
+          <div class="${riskClasses[risk.label]} risk-verdict" style="margin-bottom:10px;">
+            <div class="rv-dot" style="background:${rColor}"></div>
+            <div class="rv-text" style="color:${rColor};">ML verdict: <strong>${risk.label}</strong> — ${risk.confidence}% confidence</div>
+          </div>
+          <div class="risk-bars">${riskBars}</div>
+        </div>
+      </div>
+
+      <!-- Portfolio -->
+      <div class="section-card">
+        <div class="sc-head"><h3>Recommended Portfolio — ${fmt(p.sip)}/mo</h3><span class="model-tag tag-ws">Weighted Scoring Model</span></div>
+        <div class="sc-body">
+          <div class="fund-list">${fundsHtml}</div>
+          <div class="alert-box ab-warn" style="margin-top:10px;">Live NAV data fetched from MFAPI.in · Refresh for latest prices</div>
+        </div>
+      </div>
+
+      <!-- Goals -->
+      <div class="section-card">
+        <div class="sc-head"><h3>Goal Analysis</h3></div>
+        <div class="sc-body">${goalsHtml}</div>
+      </div>
+
+      <!-- Projections -->
+      <div class="section-card">
+        <div class="sc-head"><h3>Growth Projection · ${p.horizon} years</h3><span class="model-tag tag-gb">GradientBoosting · R² 0.9957</span></div>
+        <div class="sc-body">
+          <div class="proj-cards">
+            <div class="proj-card proj-cons"><div class="proj-lbl">Conservative</div><div class="proj-amt">${fmt(proj.conservative)}</div><div class="proj-rate">~8% CAGR</div></div>
+            <div class="proj-card proj-real"><div class="proj-lbl">Realistic</div><div class="proj-amt">${fmt(proj.realistic)}</div><div class="proj-rate">~12% CAGR</div></div>
+            <div class="proj-card proj-opti"><div class="proj-lbl">Optimistic</div><div class="proj-amt">${fmt(proj.optimistic)}</div><div class="proj-rate">~15% CAGR</div></div>
+          </div>
+          <div class="goal-feasibility ${goalMet ? 'gf-ok' : 'gf-low'}" style="margin-top:10px;">
+            ${goalMet ? `✓ Your ${fmt(p.sip)}/month SIP is on track to meet your primary goals`
+                      : `⚠ Consider increasing SIP to ${fmt(sipNeeded)}/month to meet all goals`}
+          </div>
+        </div>
+      </div>
+
+      <!-- CTA -->
+      <div class="cta-strip">
+        <div>
+          <strong>Talk to a real advisor</strong>
+          <p>Get this plan reviewed by our AMFI-registered expert in Pune</p>
+        </div>
+        <a class="cta-btn" href="/lead">Free Consultation →</a>
+      </div>
+
+      <div class="disclaimer">
+        This analysis is generated by ML models trained on synthetic data for educational purposes.<br>
+        Mutual fund investments are subject to market risks. Not investment advice.<br>
+        RetireWise+ | AMFI Registered | ARN-330249 | Pune, Maharashtra
+      </div>
+    </div>`;
+}
+</script>
+</body>
+</html>
